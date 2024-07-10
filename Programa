@@ -1,0 +1,748 @@
+package main;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
+
+import estoque.Estoque;
+
+public class Programa {
+
+	public static void main(String[] args) {
+		// criando os objetos
+		Estoque estoque = new Estoque();
+		Scanner sc = new Scanner(System.in);
+
+		// obtendo data e hora atual para relatório
+		LocalDateTime dataHoraAtual = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+		String dataHoraFormatada = dataHoraAtual.format(formatter);
+
+		// criando o arquivo de relatório
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter("relatório.csv", true));
+			File file = new File("relatório.csv");
+			if (file.length() == 0) {
+				writer.write("Data,Usuário,Função,Ação,Nome do Produto,Quantidade\n");
+			}
+
+			// funções iniciais para simular valores
+			estoque.mostrarCadastrosComSenha();
+
+			// variáveis
+			int codigo = 0, quantidade = 0, loop = 0, escolha = 0, cont = 0, contadorCodigo = 0, checkpoint = 0, funcao;
+			String nomeProduto, nomeFuncionario = null, senhaFuncionario, cpf, numeroFuncionario;
+
+			// looping do programa principal
+			while (cont == 0) {
+
+				System.out.print("Digite o seu nome completo: ");
+				String nomeCadastro = sc.nextLine();
+				System.out.print("Digite a sua senha: ");
+				String senha = sc.nextLine();
+
+				// checagem de valores com o do banco de dados do cadastro
+				if (estoque.checarCadastro(nomeCadastro, senha) == 1) {
+					System.out.println("Cadastro validado!");
+					switch (estoque.getFuncaoDesignada(nomeCadastro)) {
+					case "Gerente":
+						// começa o loop do gerente
+						int contadorGerente = 0;
+						while (contadorGerente == 0) {
+							checkpoint = 0;
+							do {
+								// verifica qual escolha o gerente quer
+								System.out.println("Você pode no sistema: ");
+								System.out.println("[1] - Cadastrar Funcionário");
+								System.out.println("[2] - Ver Cadastros");
+								System.out.println("[3] - Remover Cadastro");
+								System.out.println("[4] - Editar Cadastro");
+								System.out.println("[5] - Ver Estoque");
+								escolha = sc.nextInt();
+							} while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+							switch (escolha) {
+							case 1:
+								// caso ele queira cadastrar funcionário
+								try {
+									System.out.print("Quantidade de funcionários que você vai adicionar: ");
+									loop = sc.nextInt();
+								} catch (Exception InputMismatchException) {
+									System.out.println("Valor inválido; reinicie o programa.");
+									System.exit(1);
+								}
+								for (int i = 0; i < loop; i++) {
+									// entra no loop de funcionários para cadastrar
+									System.out.print("Digite o nome do funcionário: ");
+									sc.nextLine();
+									nomeFuncionario = sc.nextLine();
+									contadorCodigo = 0;
+									while (contadorCodigo != 2) {
+										// loop para verificar se o nome já existe no sistema
+										for (String o : estoque.getCadastros().keySet()) {
+											if (nomeFuncionario.equals(o)) {
+												contadorCodigo--;
+												while (nomeFuncionario.equals(o)) {
+													System.out.println("Esse nome já existe no sistema");
+													System.out.print("Digite outro: ");
+													nomeFuncionario = sc.nextLine();
+
+												}
+											}
+										}
+										contadorCodigo++;
+									}
+									estoque.setNomeCadastro(nomeFuncionario);
+									System.out.print("Senha: ");
+									senhaFuncionario = sc.nextLine();
+									estoque.setSenha(senhaFuncionario);
+									do {
+										// loop para verificar a função do cadastro
+										System.out.println("Função do funcionário: ");
+										System.out.println("[1] - Estoquista");
+										System.out.println("[2] - Chapa");
+										funcao = sc.nextInt();
+										if (funcao != 1 && funcao != 2) {
+											System.out.println("Este número é inválido!");
+										}
+									} while (funcao != 1 && funcao != 2);
+									estoque.setFuncaoDesignada(funcao);
+									estoque.adicionarCadastro();
+									System.out.print("Digite o Cpf do funcionário: ");
+									sc.nextLine();
+									cpf = sc.nextLine();
+									estoque.adicionarCpf(nomeFuncionario, cpf);
+									System.out.print("Número de Telefone: ");
+									numeroFuncionario = sc.nextLine();
+									estoque.adicionarNumeroFuncionario(nomeFuncionario, numeroFuncionario);
+								}
+								checkpoint++;
+								break;
+							case 2:
+								// caso o gerente queira ver os cadastros
+								do {
+									// verificação para saber qual cadastro o gerente quer saber
+									try {
+										System.out.println("[5] - Cadastros sem Senha");
+										System.out.println("[6] - Cadastros com Senha");
+										System.out.println("[7] - Dados do Funcionário");
+										escolha = sc.nextInt();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+								} while (escolha != 5 && escolha != 6 && escolha != 7);
+								if (escolha == 5) {
+									// caso ele queira ver o cadastro sem senha
+									estoque.mostrarCadastrosSemSenha();
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou o cadastro sem senha\n");
+									checkpoint++;
+								} else if (escolha == 6) {
+									// caso ele queira ver o cadastro com senha
+									estoque.mostrarCadastrosComSenha();
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou o cadastro com senha\n");
+									checkpoint++;
+								} else {
+									System.out.print("Nome completo do funcionário: ");
+									sc.nextLine();
+									nomeFuncionario = sc.nextLine();
+									contadorCodigo = 0;
+									while (contadorCodigo != 2) {
+										for (String o : estoque.getCadastros().keySet()) {
+											if (nomeFuncionario.equals(o)) {
+												contadorCodigo = 2;
+											} else {
+												while (nomeFuncionario.equals(o)) {
+													System.out.println("Esse nome não existe no sistema");
+													System.out.print("Digite outro: ");
+													nomeFuncionario = sc.nextLine();
+
+												}
+											}
+										}
+									}
+									System.out.println("Nome Completo: " + nomeFuncionario);
+									System.out.println("Senha: " + estoque.getCadastros().get(nomeFuncionario));
+									System.out.println("Cpf: " + estoque.getcpfFuncionarios().get(nomeFuncionario));
+									System.out
+											.println("Número: " + estoque.getNumeroFuncionarios().get(nomeFuncionario));
+								}
+								break;
+							case 3:
+								// caso o gerente queira remover cadastro
+								do {
+									System.out.println("Você pode: ");
+									System.out.println("[6] - Retirar cadastro por completo");
+									System.out.println("[7] - Retirar um elemento do cadastro");
+									escolha = sc.nextInt();
+								} while (escolha != 6 && escolha != 7);
+								if (escolha == 6) {
+									try {
+										System.out.print("Quantidade de cadastros que você vai remover: ");
+										loop = sc.nextInt();
+										sc.nextLine();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+									if (loop < estoque.getCadastros().size()) {
+										for (int i = 0; i < loop; i++) {
+											// entra no loop de remoção
+											contadorCodigo = 1;
+											while (contadorCodigo != 2) {
+												// Começa o loop do verificador para caso o nome não esteja no cadastro
+												System.out.print("Digite o nome completo do funcionário: ");
+												nomeFuncionario = sc.nextLine();
+												for (String o : estoque.getCadastros().keySet()) {
+													if (nomeFuncionario.equals(o)) {
+														contadorCodigo = 2;
+													}
+												}
+												if (contadorCodigo == 1) {
+													System.out.println("O nome " + nomeFuncionario
+															+ " não existe no sistema, por favor digite um nome válido");
+												}
+												if (nomeFuncionario.equals("Admin")) {
+													System.out.println("Não é permitido excluir o ADMIN");
+													contadorCodigo = 1;
+												}
+											}
+											System.out.println("Tem certeza que quer retirar o cadastro de "
+													+ nomeFuncionario + " do sistema? (s/n)");
+											if (estoque.escolhaSN().equals("s")) {
+												// caso o gerente queira excluir de fato
+												estoque.removerCadastro(nomeFuncionario);
+												writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+														+ estoque.getFuncaoDesignada(nomeCadastro) + ", Removeu "
+														+ nomeFuncionario + " do sistema\n");
+											}
+										}
+									}
+								} else {
+									//caso queira remover um elemento específico
+									contadorCodigo = 1;
+									while (contadorCodigo != 2) {
+										// Começa o loop do verificador para caso o nome não esteja no cadastro
+										sc.nextLine();
+										System.out.print("Digite o nome completo do funcionário: ");
+										nomeFuncionario = sc.nextLine();
+										for (String o : estoque.getCadastros().keySet()) {
+											if (nomeFuncionario.equals(o)) {
+												contadorCodigo = 2;
+											}
+										}
+										if (contadorCodigo == 1) {
+											System.out.println("O nome " + nomeFuncionario
+													+ " não existe no sistema, por favor digite um nome válido");
+										}
+										if (nomeFuncionario.equals("Admin")) {
+											System.out.println("Não é permitido excluir o ADMIN");
+											contadorCodigo = 1;
+										}
+									}
+									do {
+										//escolha de qual elemento irá retirar
+										System.out.println("Qual elemento você deseja remover? ");
+										System.out.println("[8] - Cpf");
+										System.out.println("[9] - Número de Telefone");
+										escolha = sc.nextInt();
+									} while (escolha != 8 && escolha != 9);
+									if (escolha == 8) {
+										//caso queira remover o cpf
+										System.out.println("Você deseja realmente deletar o cpf de " + nomeFuncionario
+												+ " do Sistema?");
+										if (estoque.escolhaSN().equals("s")) {
+											estoque.removerCpf(nomeFuncionario);
+											writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+													+ estoque.getFuncaoDesignada(nomeCadastro) + ", Removeu o cpf de "
+													+ nomeFuncionario + " do sistema\n");
+										}
+									} else {
+										//caso queira remover o numero
+										System.out.println("Você deseja realmente deletar o número de "
+												+ nomeFuncionario + " do Sistema?");
+										if (estoque.escolhaSN().equals("s")) {
+											estoque.removerNumero(nomeFuncionario);
+											writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+													+ estoque.getFuncaoDesignada(nomeCadastro)
+													+ ", Removeu o numero de contato de " + nomeFuncionario
+													+ " do sistema\n");
+										}
+									}
+								}
+								break;
+							case 4:
+								//Caso o gerente queira editar algum dado
+								sc.nextLine();
+								System.out.print("Nome completo do funcionário: ");
+								nomeFuncionario = sc.nextLine();
+								contadorCodigo = 0;
+								while (contadorCodigo != 2) {
+									//loop para caso o nome não exista
+									for (String o : estoque.getCadastros().keySet()) {
+										if (nomeFuncionario.equals(o)) {
+											contadorCodigo = 2;
+										} else {
+											while (nomeFuncionario.equals(o)) {
+												System.out.println("Esse nome não existe no sistema");
+												System.out.print("Digite outro: ");
+												nomeFuncionario = sc.nextLine();
+
+											}
+										}
+									}
+								}
+								do {
+									//escolha de dado editável
+									System.out.println("Qual dado você deseja editar?");
+									System.out.println("[1] - Cpf");
+									System.out.println("[2] - Número de Telefone");
+									System.out.println("[3] - Senha");
+									System.out.print("Escolha: ");
+									escolha = sc.nextInt();
+								} while (escolha != 1 && escolha != 2 && escolha != 3);
+								if (escolha == 1) {
+									//caso escolha editar o cpf
+									sc.nextLine();
+									System.out.print("Digite o novo Cpf: ");
+									cpf = sc.nextLine();
+									estoque.adicionarCpf(nomeFuncionario, cpf);
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Editou o cpf do funcionário " + nomeFuncionario + "\n");
+								} else if (escolha == 2) {
+									//caso escolha editar no número de telefone
+									System.out.println("Digite o novo número de Contato: ");
+									sc.nextLine();
+									numeroFuncionario = sc.nextLine();
+									estoque.adicionarNumeroFuncionario(nomeFuncionario, numeroFuncionario);
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Editou o número de Contato do funcionário" + nomeFuncionario + "\n");
+								} else {
+									//caso queira editar a senha
+									System.out.print("Digite a nova senha: ");
+									sc.nextLine();
+									senhaFuncionario = sc.nextLine();
+									estoque.editarSenha(nomeFuncionario, senhaFuncionario);
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Editou a senha do funcionário" + nomeFuncionario + "\n");
+								}
+								break;
+
+							case 5:
+								// caso o gerente queira ver o estoque
+								escolha = estoque.questionarioEstoque();
+								if (escolha == 0) {
+									// caso ele queira ver o estoque simplificado
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou estoque simplificado\n");
+								} else if (escolha == 1) {
+									// caso ele queira ver o estoque detalhado
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou estoque detalhado\n");
+								} else {
+									// caso ele queira ver um produto específico do estoque
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro) + ", Visualizou o produto "
+											+ estoque.getNomeEstoque().get(estoque.getCodigo()) + "\n");
+								}
+								checkpoint++;
+								break;
+							}
+							System.out.print("Você vai fazer mais alguma operação? (s/n) ");
+							if (checkpoint == 1) {
+								sc.nextLine();
+							}
+							if (estoque.escolhaSN().equals("n")) {
+								contadorGerente++;
+							}
+						}
+						break;
+					case "Estoquista":
+						// começa o loop do estoquista
+						checkpoint = 0;
+						int contadorEstoquista = 0;
+						while (contadorEstoquista == 0) {
+							do {
+								// Verificador de valor
+								try {
+									System.out.println("Você pode no sistema: ");
+									System.out.println("[1] - Ver estoque");
+									System.out.println("[2] - Retirar produto do estoque");
+									escolha = sc.nextInt();
+								} catch (Exception InputMismatchException) {
+									System.out.println("Valor inválido; reinicie o programa.");
+									System.exit(1);
+								}
+							} while (escolha != 1 && escolha != 2);
+							switch (escolha) {
+							case 1:
+								// escolha do tipo de estoque que ele quer ver
+								escolha = estoque.questionarioEstoque();
+								if (escolha == 0) {
+									// caso ele queira ver o estoque simplificado
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou estoque simplificado\n");
+								} else if (escolha == 1) {
+									// caso ele queira ver o estoque detalhado
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou estoque detalhado\n");
+								} else {
+									// caso ele queira ver um produto específico do estoque
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro) + ", Visualizou o produto "
+											+ estoque.getNomeEstoque().get(estoque.getCodigo()) + "\n");
+								}
+								break;
+							case 2:
+								// Caso o usuário escolha retirar produto do estoque (2)
+								do {
+									// Verificador de valor
+									try {
+										System.out.println("[3] - Retirar produto por completo");
+										System.out.println("[4] - Retirar quantidade do produto");
+										escolha = sc.nextInt();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+								} while (escolha != 3 && escolha != 4);
+								if (escolha == 3) {
+									// Caso escolha retirar produto por completo (3)
+									try {
+										System.out.print(
+												"Quantidade produtos você quer retirar por completo do estoque: ");
+										loop = sc.nextInt();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+									if (loop <= estoque.getNomeEstoque().size()) {
+										for (int i = 0; i < loop; i++) {
+											// Começa o loop da quantidade de produtos que o usuário vai querer tirar do
+											// estoque
+											contadorCodigo = 1;
+											while (contadorCodigo != 2) {
+												// Começa o loop do verificador para caso o código não esteja no estoque
+												try {
+													System.out.print("Código do produto: ");
+													codigo = sc.nextInt();
+												} catch (Exception InputMismatchException) {
+													System.out.println("Valor inválido; reinicie o programa.");
+													System.exit(1);
+												}
+												for (Integer o : estoque.getNomeEstoque().keySet()) {
+													if (codigo == o) {
+														contadorCodigo = 2;
+													}
+												}
+												if (contadorCodigo == 1) {
+													System.out.println("O código " + codigo
+															+ " não existe no sistema, por favor digite um código válido");
+												}
+
+											}
+											// Verificação se é de fato o produto que o usuário deseja retirar do
+											// estoque
+											System.out.println("Deseja mesmo retirar o produto "
+													+ estoque.getNomeEstoque().get(codigo) + " do estoque (s/n)?");
+											sc.nextLine();
+											if (estoque.escolhaSN().equals("s")) {
+												estoque.removerProdutoInteiro(codigo);
+												writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+														+ estoque.getFuncaoDesignada(nomeCadastro)
+														+ ", Retirou produto por completo,"
+														+ estoque.getNomeEstoque().get(codigo) + "\n");
+												checkpoint++;
+											}
+										}
+									} else {
+										System.out.println("Este número é inválido!");
+									}
+								} else {
+									// Caso ele escolha retirar quantidade de produto
+									try {
+										System.out.println("Quantidade de produtos que você vai subtrair valores: ");
+										loop = sc.nextInt();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+									for (int i = 0; i < loop; i++) {
+										// Começa o loop da quantidade de produtos que ele deseja subtrair valores
+										contadorCodigo = 1;
+										while (contadorCodigo != 2) {
+											// loop para verificar se o código está no estoque
+											try {
+												System.out.print("Código do produto: ");
+												codigo = sc.nextInt();
+											} catch (Exception InputMismatchException) {
+												System.out.println("Valor inválido; reinicie o programa.");
+												System.exit(1);
+											}
+											for (Integer o : estoque.getNomeEstoque().keySet()) {
+												if (codigo == o) {
+													contadorCodigo = 2;
+												}
+											}
+											if (contadorCodigo == 1) {
+												System.out.println("O código " + codigo
+														+ " não existe no sistema, por favor digite um código válido");
+											}
+
+										}
+										estoque.setCodigo(codigo);
+										do {
+											// Loop para que uma quantidade válida seja posta
+											try {
+												System.out.print("Quantidade a ser removida: ");
+												quantidade = sc.nextInt();
+											} catch (Exception InputMismatchException) {
+												System.out.println("Valor inválido; reinicie o programa.");
+												System.exit(1);
+											}
+											if (quantidade < 0 || quantidade == 0
+													|| quantidade > estoque.getQuantidadeEstoque().get(codigo)) {
+												System.out.println("Número inválido, por favor ponha um número válido");
+											}
+										} while (quantidade < 0 || quantidade == 0
+												|| quantidade > estoque.getQuantidadeEstoque().get(codigo));
+										estoque.setQuantidade(quantidade);
+										estoque.removerProdutoQuantidade(quantidade);
+										writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+												+ estoque.getFuncaoDesignada(senha)
+												+ ", Retirou quantidade de produto, "
+												+ estoque.getNomeEstoque().get(codigo) + ", " + quantidade + "\n");
+
+									}
+								}
+								break;
+							}
+							System.out.println("Você vai fazer mais alguma operação (s/n)? ");
+							if (checkpoint != 1) {
+								sc.nextLine();
+							}
+							if (estoque.escolhaSN().equals("n")) {
+								contadorEstoquista = 1;
+							}
+						}
+						break;
+					case "Chapa":
+						// começa o loop do chapa
+						int contadorChapa = 0;
+						while (contadorChapa == 0) {
+							checkpoint = 0;
+							// opções do chapa no sistema
+							do {
+								try {
+									System.out.println("Você pode no sistema: ");
+									System.out.println("[1] - Ver estoque");
+									System.out.println("[2] - Adicionar produto");
+									System.out.println("[3] - Editar data de fabricação/validade");
+									escolha = sc.nextInt();
+								} catch (Exception InputMismatchException) {
+									System.out.println("Valor inválido; reinicie o programa.");
+									System.exit(1);
+								}
+								if (escolha != 1 && escolha != 2 && escolha != 3) {
+									System.out.println("Digite um número válido!");
+								}
+							} while (escolha != 1 && escolha != 2 && escolha != 3);
+							switch (escolha) {
+							case 1:
+								// escolha do tipo de estoque que ele quer ver
+								escolha = estoque.questionarioEstoque();
+								if (escolha == 0) {
+									// caso ele queira ver o estoque simplificado
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou estoque simplificado\n");
+								} else if (escolha == 1) {
+									// caso ele queira ver o estoque detalhado
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", Visualizou estoque detalhado\n");
+								} else {
+									// caso ele queira ver um produto específico do estoque
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro) + ", Visualizou o produto "
+											+ estoque.getNomeEstoque().get(estoque.getCodigo()) + "\n");
+								}
+								checkpoint++;
+								break;
+							case 2:
+								// caso escolha adicionar produto (2)
+								do {
+									// verificação de um número valido (3 ou 4)
+									try {
+										System.out.println("[4] - Adicionar produto novo");
+										System.out.println("[5] - Adicionar quantidade de produto");
+										escolha = sc.nextInt();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+								} while (escolha != 4 && escolha != 5);
+								if (escolha == 4) {
+									// Se for o caso de ele adicionar o produto novo
+									try {
+										System.out.print(
+												"Quantidade de produtos novos que você vai adicionar no estoque: ");
+										loop = sc.nextInt();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+									for (int i = 0; i < loop; i++) {
+										// loop para caso ele escolha um codigo já existente
+										String escolhaSNChapa = "";
+										contadorCodigo = 1;
+										try {
+											System.out.print("Código do produto: ");
+											codigo = sc.nextInt();
+										} catch (Exception InputMismatchException) {
+											System.out.println("Valor inválido; reinicie o programa.");
+											System.exit(1);
+										}
+										while (contadorCodigo != 2) {
+											// loop para verificar se o código já existe no sistema
+											for (Integer o : estoque.getNomeEstoque().keySet()) {
+												if (codigo == o) {
+													contadorCodigo--;
+													while (codigo == o) {
+														System.out.println("Esse código já existe no sistema");
+														System.out.println("Nome do Produto: "
+																+ estoque.getNomeEstoque().get(codigo)
+																+ ", Quantidade: "
+																+ estoque.getQuantidadeEstoque().get(codigo));
+														System.out.print("Digite outro: ");
+														codigo = sc.nextInt();
+
+													}
+												}
+											}
+											contadorCodigo++;
+										}
+										estoque.setCodigo(codigo);
+										// entrada da data de fabricação
+										System.out.print("O produto tem data de validade? (s/n)");
+										sc.nextLine();
+										if (estoque.escolhaSN().equals("s")) {
+											estoque.validadeFabricacao();
+										}
+										System.out.print("Nome do produto: ");
+										nomeProduto = sc.nextLine();
+										for (Integer o : estoque.getNomeEstoque().keySet()) {
+											// condicional para caso o nome já esteja no estoque
+											if (nomeProduto.equals(estoque.getNomeEstoque().get(o))) {
+												estoque.setCodigo(o);
+												estoque.setNomeProduto(nomeProduto);
+												System.out.println("Esse nome já existe no sistema:");
+												System.out.println("Código: " + o + ", Nome do Produto: "
+														+ estoque.getNomeEstoque().get(o) + ", Quantidade: "
+														+ estoque.getQuantidadeEstoque().get(o));
+												System.out.print("você deseja adicionar quantidade? (s/n) ");
+												if (estoque.escolhaSN().equals("s")) {
+													estoque.setQuantidade(estoque.verificadorQuantidade());
+													estoque.adicionarProdutoQuantidade();
+													writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+															+ estoque.getFuncaoDesignada(nomeCadastro)
+															+ ", Adicionou quantidade de produto," + nomeProduto + ", "
+															+ estoque.getQuantidade() + "\n");
+													escolhaSNChapa = " ";
+												}
+											}
+										}
+										if (escolhaSNChapa.equals("")) {
+											// caso não tenha entrado no loop do nome repetido
+											estoque.setNomeProduto(nomeProduto);
+											estoque.verificadorQuantidade();
+											estoque.adicionarProduto();
+											writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+													+ estoque.getFuncaoDesignada(nomeCadastro)
+													+ ", Adicionou novo produto," + estoque.getNomeEstoque().get(codigo)
+													+ ", " + estoque.getQuantidade() + "\n");
+
+										}
+									}
+								} else {
+									// se for o caso de ele adicionar quantidade
+									try {
+										System.out.print("Qual a quantidade de adições serão feitas: ");
+										loop = sc.nextInt();
+									} catch (Exception InputMismatchException) {
+										System.out.println("Valor inválido; reinicie o programa.");
+										System.exit(1);
+									}
+									for (int i = 0; i < loop; i++) {
+										// loop das adições que serão feitas
+										estoque.setCodigo(estoque.verificarCodigoAusente());
+										estoque.setQuantidade(estoque.verificadorQuantidade());
+										estoque.adicionarProdutoQuantidade();
+										writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+												+ estoque.getFuncaoDesignada(nomeCadastro)
+												+ ", Adicionou quantidade de produto, "
+												+ estoque.getNomeEstoque().get(estoque.getCodigo()) + ", "
+												+ estoque.getQuantidade() + "\n");
+										contadorCodigo = 0;
+									}
+									checkpoint++;
+								}
+								break;
+							case 3:
+								try {
+									System.out.print("Quantidade de produtos que você vai editar: ");
+									loop = sc.nextInt();
+								} catch (Exception InputMismatchException) {
+									System.out.println("Valor inválido; reinicie o programa.");
+									System.exit(1);
+								}
+								for (int i = 0; i < loop; i++) {
+									estoque.setCodigo(estoque.verificarCodigoAusente());
+									estoque.validadeFabricacao();
+									writer.write(dataHoraFormatada + ", " + nomeCadastro + ", "
+											+ estoque.getFuncaoDesignada(nomeCadastro)
+											+ ", editou a data de validade do produto "
+											+ estoque.getNomeEstoque().get(estoque.getCodigo()) + "\n");
+								}
+								checkpoint++;
+								break;
+							}
+							System.out.print("Você vai fazer mais alguma operação (s/n)? ");
+							if (checkpoint == 1) {
+								sc.nextLine();
+							}
+							if (estoque.escolhaSN().equals("n")) {
+								contadorChapa = 1;
+							}
+						}
+					}
+				} else {
+					System.out.println("Nome ou senha incorretos, tente novamente!");
+				}
+				System.out.print("Você que continuar no sistema? (s/n) ");
+				if (estoque.escolhaSN().equals("n")) {
+					cont += 1;
+				}
+			}
+			sc.close();
+			writer.close();
+
+		} catch (IOException e) {
+			System.out.println("Erro ao criar ou escrever no arquivo de relatório: " + e.getMessage());
+		}
+	}
+}
