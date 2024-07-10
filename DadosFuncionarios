@@ -1,0 +1,60 @@
+package estoque;
+
+import java.util.HashMap;
+
+public class DadosFuncionarios {
+	
+	//dicionário dos cpfs dos funcionários
+	HashMap <String, String> cpfFuncionarios = new HashMap <String, String>();
+	//dicionário dos números de contato dos funcionários
+	HashMap <String, String> numeroFuncionarios = new HashMap <String, String>();
+	
+	//variáveis
+	private String cpf, numeroFuncionario;
+
+	//setters para mudar os valores
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
+	}
+	public void setRua(String numeroFuncionario) {
+		this.numeroFuncionario = numeroFuncionario;
+	}
+	
+	//getters para buscar valores
+	public HashMap<String, String> getcpfFuncionarios() {
+		return cpfFuncionarios;
+	}
+	public HashMap<String, String> getNumeroFuncionarios() {
+		return numeroFuncionarios;
+	}
+	public String getCpf() {
+		return this.cpf;
+	}
+	public String getNumeroFuncionario() {
+		return this.numeroFuncionario;
+	}
+	
+	//Função para adicionar/editar o número do funcionário
+	public void adicionarNumeroFuncionario(String nomeFuncionario, String numeroFuncionario) {
+		numeroFuncionarios.put(nomeFuncionario, numeroFuncionario);
+	}
+	
+	//função para adicionar/editar o cpf do funcionário
+	public void adicionarCpf(String nomeFuncionario, String cpf) {
+		cpfFuncionarios.put(nomeFuncionario, cpf);
+	}
+	
+	//Função para remover o cpf do funcionário
+	public void removerCpf(String nomeFuncionario) {
+		cpfFuncionarios.remove(nomeFuncionario);
+	}
+	
+	//Função para remover o número do funcionário
+	public void removerNumero(String nomeFuncionario) {
+		numeroFuncionarios.remove(nomeFuncionario);
+	}
+	
+	
+
+}
+
