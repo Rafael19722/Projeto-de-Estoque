@@ -1,0 +1,476 @@
+package estoque;
+
+import java.util.HashMap;
+import java.util.Scanner;
+
+public class Estoque extends DadosFuncionarios {
+	//dicionário dos nomes dos produtos
+	HashMap <Integer, String> nomeEstoque = new HashMap <Integer, String>();
+
+	//dicionario das quantidades dos respectivos produtos
+	HashMap <Integer, Integer> quantidadeEstoque = new HashMap <Integer, Integer>();
+	
+	//dicionario da data de fabricação dos produtos
+	HashMap <Integer, String> dataFabricacaoProdutos = new HashMap <Integer, String>();
+	
+	//dicionario da data de validade
+	HashMap <Integer, String> dataValidadeProdutos = new HashMap <Integer, String>();
+	
+	//dicionario que vai guardar os nomes do cadastro
+	HashMap <String, String> cadastros = new HashMap <String, String>();
+	
+	//dicionario das funções
+	HashMap <String, String> funcao = new HashMap <String, String>();
+	
+	//chamada do scanner
+	Scanner sc = new Scanner(System.in);
+	
+	
+	//variáveis privadas
+	private Integer codigo;
+	private String nomeProduto;
+	private Integer quantidade;
+	private String dataFabricacao;
+	private String dataValidade;
+	private String nomeCadastro;
+	private String senha;
+	private String funcaoDesignada;
+	
+	//variáveis locais
+	int diaFabricacao=0, mesFabricacao=0, anoFabricacao=0, diaValidade=0, mesValidade=0, anoValidade=0;
+	char escolhaSN;
+	
+	//construtor
+	public Estoque() {
+		nomeEstoque.put(1, "Macarrão");
+		quantidadeEstoque.put(1, 100);
+		dataFabricacaoProdutos.put(1, "16/04/2024");
+		dataValidadeProdutos.put(1, "20/06/2025");
+		nomeEstoque.put(2, "Arroz");
+		quantidadeEstoque.put(2, 98);
+		dataFabricacaoProdutos.put(2, "05/01/2024");
+		dataValidadeProdutos.put(2, "25/09/2025");
+		nomeEstoque.put(3, "Feijão");
+		quantidadeEstoque.put(3, 120);
+		dataFabricacaoProdutos.put(3, "07/03/2024");
+		dataValidadeProdutos.put(3, "13/10/2025");
+		nomeEstoque.put(4, "Óleo de Soja");
+		quantidadeEstoque.put(4, 98);
+		dataFabricacaoProdutos.put(4, "19/05/2024");
+		dataValidadeProdutos.put(4, "30/03/2025");
+		nomeEstoque.put(5, "Farinha de Trigo");
+		quantidadeEstoque.put(5, 95);
+		dataFabricacaoProdutos.put(5, "10/09/2024");
+		dataValidadeProdutos.put(5, "20/12/2024");
+		nomeEstoque.put(6, "Molho de Tomate");
+		quantidadeEstoque.put(6, 78);
+		dataFabricacaoProdutos.put(6, "04/04/2024");
+		dataValidadeProdutos.put(6, "25/08/2025");
+		nomeEstoque.put(7, "Açucar");
+		quantidadeEstoque.put(7, 46);
+		dataFabricacaoProdutos.put(7, "12/06/2024");
+		dataValidadeProdutos.put(7, "31/12/2025");
+		nomeEstoque.put(8, "Salsa");
+		quantidadeEstoque.put(8, 79);
+		dataFabricacaoProdutos.put(8, "01/06/2024");
+		dataValidadeProdutos.put(8, "05/11/2025");
+		cadastros.put("Admin", "12345");
+		funcao.put("Admin", "Gerente");
+		cadastros.put("Rafael", "123");
+		funcao.put("Rafael", "Chapa");
+		cadastros.put("Pedro", "123");
+		funcao.put("Pedro", "Estoquista");
+		cpfFuncionarios.put("Rafael", "123.456.789-10");
+		numeroFuncionarios.put("Rafael", "71 98528-0372");
+		cpfFuncionarios.put("Pedro", "111.213.141-15");
+		numeroFuncionarios.put("Pedro", "71 98746-5378");
+		cpfFuncionarios.put("Admin", "123.574.896-45");
+		numeroFuncionarios.put("Admin", "71 98751-3265");
+	}
+	
+	//setters para mudar o valor das nossas variáveis
+	public void setCodigo(Integer codigo) {
+		this.codigo = codigo;
+	}
+	public void setNomeProduto(String nome) {
+		this.nomeProduto = nome;
+	}
+	public void setQuantidade(Integer quantidade) {
+		this.quantidade = quantidade;
+	}
+	public void setNomeEstoque(Integer codigo, String nome) {
+		
+	}
+	public void setDataFabricacao(String dataFabricacao) {
+		this.dataFabricacao = dataFabricacao;
+	}
+	public void setDataValidade(String dataValidade) {
+		this.dataValidade = dataValidade;
+	}
+	public void setNomeCadastro(String nomeCadastro) {
+		this.nomeCadastro = nomeCadastro;
+	}
+	public void setSenha(String senha) {
+		this.senha = senha;
+	}
+	public void setFuncaoDesignada(int funcaoDesignada) {
+		if (funcaoDesignada == 1) {
+			this.funcaoDesignada = "Estoquista";
+		} else if (funcaoDesignada == 2) {
+			this.funcaoDesignada = "Chapa";
+		} else {
+			this.funcaoDesignada = "Gerente";
+		}
+	}
+
+	// getters para pegar os valores dos atributos
+	public int getCodigo() {
+		return this.codigo;
+	}
+	public int getQuantidade() {
+		return this.quantidade;
+	}
+	public HashMap<Integer, String> getNomeEstoque() {
+		return nomeEstoque;
+	}
+	public HashMap<Integer, Integer> getQuantidadeEstoque() {
+		return quantidadeEstoque;
+	}
+	public HashMap<String, String> getCadastros() {
+		return cadastros;
+	}
+	public String getFuncaoDesignada(String senha) {
+		return funcao.get(senha);
+	}
+	
+	//função que vai adicionar a quantidade de produto
+	public void adicionarProdutoQuantidade() {
+		Integer variavelTemporaria = 0;
+		variavelTemporaria = quantidadeEstoque.get(codigo) + quantidade;
+		quantidadeEstoque.put(codigo, variavelTemporaria);
+	}
+	
+	//função que adiciona produtos aos dicionário
+	public void adicionarProduto() {
+		nomeEstoque.put(codigo, nomeProduto);
+		quantidadeEstoque.put(codigo, quantidade);
+	}
+	
+	//função que adiciona a data de fabricação ao produto
+	public void adicionarDataFabricacao() {
+		dataFabricacaoProdutos.put(this.codigo, this.dataFabricacao);
+	}
+	
+	//função que adiciona a data de validade ao produto
+	public void adicionarDataValidade() {
+		dataValidadeProdutos.put(this.codigo, this.dataValidade);
+	}
+
+	//função que remove a chave do dicionário, assim removendo os produtos em si
+	public void removerProdutoInteiro(Integer codigo) {
+		nomeEstoque.remove(codigo);
+		quantidadeEstoque.remove(codigo);
+	}
+
+	//função que remove a quantidade do produto
+	public void removerProdutoQuantidade(Integer quantidade) {
+		Integer variavelTemporaria = 0;
+		variavelTemporaria = quantidadeEstoque.get(codigo) - quantidade;
+		quantidadeEstoque.put(codigo, variavelTemporaria);
+	}
+
+	//função que mostra o estoque simplificado
+	public void mostrarEstoqueSimplificado() {
+		System.out.println("****** ESTOQUE ******");
+    		for (Integer i : nomeEstoque.keySet()) {
+      			System.out.print("Código: " + i + ", Produto: " + nomeEstoque.get(i));
+      			System.out.println(", Quantidade: " + quantidadeEstoque.get(i));
+    		}
+	}
+	
+	//função que mostra o estoque com a data de fabricação/validade
+	public void mostrarEstoqueDetalhado() {
+		System.out.println("****** ESTOQUE ******");
+    		for (Integer i : nomeEstoque.keySet()) {
+      			System.out.print("Código: " + i + ", Produto: " + nomeEstoque.get(i));
+      			System.out.print(", Quantidade: " + quantidadeEstoque.get(i));
+      			System.out.println(", Data de Fabricação: " + dataFabricacaoProdutos.get(i) + ", Data de Validade: " + dataValidadeProdutos.get(i));
+    		}
+	}
+	
+	//função que vai responder qual estoque o usuário quer ver
+	public int questionarioEstoque() {
+		int escolha = 0;
+		do {
+                    try {
+			System.out.println("[1] - Estoque Simplificado");
+			System.out.println("[2] - Estoque Detalhado");
+			System.out.println("[3] - Produto Específico");
+			escolha = sc.nextInt();
+                        } catch(Exception InputMismatchException) {
+                        System.out.println("Valor inválido; reinicie o programa.");
+                        System.exit(0);
+                        }
+		} while (escolha != 1 && escolha != 2 && escolha != 3);
+		if (escolha == 1) {
+			//caso o usuário queira ver o estoque simplificado (mostrar sem a data de fabricação/validade)
+			mostrarEstoqueSimplificado();
+			return 0;
+		} else if (escolha == 2){
+			//caso o usuário queira ver o estoque detalhado (mostrar a data de fabricação/validade)
+			mostrarEstoqueDetalhado();
+			return 1;
+		} else {
+			verificarCodigoAusente();
+			for (Integer i : nomeEstoque.keySet()) {
+				if (i == codigo) {
+					System.out.print("Código: " + i + ", Produto: " + nomeEstoque.get(i));
+					System.out.print(", Quantidade: " + quantidadeEstoque.get(i));
+					System.out.println(", Data de Fabricação: " + dataFabricacaoProdutos.get(i) + ", Data de Validade: " + dataValidadeProdutos.get(i));
+				}
+    		}
+			return 2;
+		}
+	}
+	
+	//função que verifica se o código está ausente no estoque
+	public int verificarCodigoAusente() {
+		int contadorCodigo = 1;
+		while (contadorCodigo != 2) {
+			//loop para verificar se o código já existe no sistema
+			contadorCodigo = 1;
+			while (contadorCodigo != 2) {
+				//Começa o loop do verificador para caso o código não esteja no estoque
+                                try{
+				System.out.print("Código do produto: ");
+				codigo = sc.nextInt();
+                                } catch(Exception InputMismatchException) {
+                                System.out.println("Valor inválido; reinicie o programa.");
+                                System.exit(1);
+                                }
+				for (Integer o : getNomeEstoque().keySet()) {
+					if (codigo == o) {
+						contadorCodigo = 2;
+					}
+				}
+				if (contadorCodigo == 1) {
+					System.out.println("O código " + codigo
+						+ " não existe no sistema, por favor digite um código válido");
+				}
+
+			}
+		}
+		return codigo;
+	}
+	
+	//função que verifica se o valor de quantidade é válido
+	public int verificadorQuantidade() {
+		do {
+			//loop para verificação de valor de válido
+                        try {
+			System.out.print("Quantidade a ser adicionada: ");
+			quantidade = sc.nextInt();
+                        } catch(Exception InputMismatchException) {
+                        System.out.println("Valor inválido; reinicie o programa.");
+                        System.exit(1);
+                        }
+			if (quantidade < 0 || quantidade == 0) {
+				System.out.println("Número inválido, por favor ponha um número válido");
+			}
+		} while (quantidade < 0 || quantidade == 0);
+		return quantidade;
+	}
+	
+	//função que vai dizer a data de fabricacao/validade do produto
+	public void validadeFabricacao() {
+		System.out.println("Data de Fabricação");
+		do {
+                        try{
+			System.out.print("Dia: ");
+			diaFabricacao = sc.nextInt();
+                        } catch(Exception InputMismatchException) {
+                        System.out.println("Valor inválido; reinicie o programa.");
+                        System.exit(1);
+                        }
+			if (diaFabricacao <= 0 || diaFabricacao >31) {
+				System.out.println("Esse número é inválido!");
+			}
+		} while(diaFabricacao <= 0 || diaFabricacao >31);
+		do {
+                        try{
+			System.out.print("Mês: ");
+			mesFabricacao = sc.nextInt();
+                        } catch(Exception InputMismatchException) {
+                        System.out.println("Valor inválido; reinicie o programa.");
+                        System.exit(1);
+                        }
+			if (mesFabricacao <= 0 || mesFabricacao > 12) {
+				System.out.println("Esse número não é válido");
+			}
+		} while(mesFabricacao <= 0 || mesFabricacao > 12);
+		do {
+                        try{
+			System.out.print("Ano: ");
+			anoFabricacao = sc.nextInt();
+                        } catch(Exception InputMismatchException) {
+                        System.out.println("Valor inválido; reinicie o programa.");
+                        System.exit(1);
+                        }
+			if (anoFabricacao < 2000 || anoFabricacao > 3000) {
+				System.out.println("Esse número não é válido");
+			}
+		} while(anoFabricacao < 2000 || anoFabricacao > 3000);
+		if (mesFabricacao >= 10 && diaFabricacao >= 10) {
+			dataFabricacao = diaFabricacao + "/" + mesFabricacao+ "/" + anoFabricacao;
+		} else if (diaFabricacao < 10) {
+			dataFabricacao = "0" + diaFabricacao + "/" + mesFabricacao+ "/" + anoFabricacao;
+
+		} else if (mesFabricacao < 10) {
+			dataFabricacao = diaFabricacao + "/0" + mesFabricacao + "/" + anoFabricacao;
+		} else if (diaFabricacao < 10 && mesFabricacao < 10) {
+			dataFabricacao = "0" + diaFabricacao + "/0" + mesFabricacao + "/" + anoFabricacao;
+		}
+		dataFabricacaoProdutos.put(codigo, dataFabricacao);
+		System.out.println("Data de Validade");
+		do {
+                        try{
+			System.out.print("Ano: ");
+			anoValidade = sc.nextInt();
+                        } catch(Exception InputMismatchException) {
+                        System.out.println("Valor inválido; reinicie o programa.");
+                        System.exit(1);
+                        }
+			if (anoValidade < 2000 || anoValidade > 3000 || anoValidade < anoFabricacao) {
+				System.out.println("Esse número não é válido");
+			}
+		} while(anoValidade < 2000 || anoValidade > 3000 || anoValidade < anoFabricacao);
+		if (anoValidade == anoFabricacao) {
+			do {
+                                try{
+				System.out.print("Mês: ");
+				mesValidade = sc.nextInt();
+                                } catch(Exception InputMismatchException) {
+                                System.out.println("Valor inválido; reinicie o programa.");
+                                System.exit(1);
+                                }
+				if (mesValidade <= 0 || mesValidade > 12 || mesValidade < mesFabricacao) {
+					System.out.println("Esse número não é válido");
+				}
+			} while(mesValidade <= 0 || mesValidade > 12 || mesValidade < mesFabricacao);
+		} else {
+			do {
+                                try{
+				System.out.print("Mês: ");
+				mesValidade = sc.nextInt();
+                                } catch(Exception InputMismatchException) {
+                                System.out.println("Valor inválido; reinicie o programa.");
+                                System.exit(1);
+                                }
+				if (mesValidade <= 0 || mesValidade > 12) {
+					System.out.println("Esse número não é válido");
+				}
+			} while(mesValidade <= 0 || mesValidade > 12);
+		}
+		if (mesValidade == mesFabricacao && anoValidade == anoFabricacao) {
+			do {
+                                try{
+				System.out.print("Dia: ");
+				diaValidade = sc.nextInt();
+                                } catch(Exception InputMismatchException) {
+                                System.out.println("Valor inválido; reinicie o programa.");
+                                System.exit(1);
+                                }
+				if (diaValidade <= 0 || diaValidade >31 || diaValidade <= diaFabricacao) {
+					System.out.println("Esse número é inválido!");
+				}
+			} while(diaValidade <= 0 || diaValidade >31 || diaValidade <= diaFabricacao);
+		} else {
+			do {
+				System.out.print("Dia: ");
+				diaValidade = sc.nextInt();
+				if (diaValidade <= 0 || diaValidade >31) {
+					System.out.println("Esse número é inválido!");
+				}
+			} while(diaValidade <= 0 || diaValidade >31);
+		}
+		if (mesValidade >= 10 && diaValidade >= 10) {
+			dataValidade = diaValidade + "/" + mesValidade+ "/" + anoValidade;
+		} else if (diaValidade < 10) {
+			dataValidade = "0" + diaValidade + "/" + mesValidade+ "/" + anoValidade;
+
+		} else if (mesValidade < 10) {
+			dataValidade = diaValidade + "/0" + mesValidade + "/" + anoValidade;
+		} else if (diaValidade < 10 && mesValidade < 10) {
+			dataValidade = "0" + diaValidade + "/0" + mesValidade + "/" + anoValidade;
+		}
+		dataValidadeProdutos.put(codigo, dataValidade);
+	}
+	
+	//checa se o login e senha são validos, retornando um valor para cada situação
+	public int checarCadastro(String nomeCadastro, String senha) {
+		try {
+		if (cadastros.get(nomeCadastro).equals(senha)) {
+				return 1;
+			} else {
+				return 0;
+			}
+		} catch (NullPointerException nexc) {
+			return 2;
+		}
+		
+	}
+	
+	//adiciona o cadastro colocando o nome, a senha e a função
+	public void adicionarCadastro() {
+		cadastros.put(nomeCadastro, senha);
+		funcao.put(nomeCadastro, funcaoDesignada);
+	}
+	
+	public void editarSenha(String nomeFuncionario, String senhaFuncionario) {
+		cadastros.put(nomeFuncionario, senhaFuncionario);
+	}
+	
+	//vai remover o cadastro, mas só utilizando a senha como parâmetro de entrada
+	public void removerCadastro(String nomeCadastro) {
+		cadastros.remove(nomeCadastro);
+		funcao.remove(nomeCadastro);
+		cpfFuncionarios.remove(nomeCadastro);
+		numeroFuncionarios.remove(nomeCadastro);
+	}
+	
+	//vai mostrar os cadastros sem a senha, bom para quem quer apenas verificar
+	public void mostrarCadastrosSemSenha() {
+		System.out.println("****** CADASTROS ******");
+		for (String i : cadastros.keySet()) {
+	  		System.out.println("Funcionário: " + i);
+	  		System.out.println("Função: " + funcao.get(i));
+	  		System.out.println("----------");
+		}
+	}
+	
+	//vai mostrar o cadastro com a senha, bom pra quem quer retirar alguem do sistema
+	public void mostrarCadastrosComSenha() {
+		System.out.println("****** CADASTROS ******");
+		for (String i : cadastros.keySet()) {
+	  		System.out.println("Funcionário: " + i);
+	  		System.out.println("Função: " + funcao.get(i));
+	  		System.out.println("Senha: " + cadastros.get(i));
+	  		System.out.println("----------");
+		}
+	}
+	
+	public String escolhaSN() {
+		do {
+			escolhaSN = sc.next().charAt(0);
+			if (escolhaSN != 's' && escolhaSN != 'n') {
+				System.out.println("Este caractere é invalido! Escolha entre (s/n)");
+			}
+		} while (escolhaSN != 's' && escolhaSN != 'n');
+		if (escolhaSN == 's') {
+			return "s";
+		} else {
+			return "n";
+		}
+	}
+	
+}
